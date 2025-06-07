@@ -25,6 +25,9 @@ jobs:
       - name: Set up Docker Compose
         uses: ndeloof/install-compose-action@v0.0.1
 
+      - name: Pull required browser image
+        run: docker pull selenoid/vnc:chrome_114.0
+
       - name: Run tests with Docker Compose
         run: docker-compose up --build --abort-on-container-exit --exit-code-from test
 
