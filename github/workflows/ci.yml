@@ -1,0 +1,40 @@
+name: Run Selenium Tests with Allure Report
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  checkout-and-print-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Print project tree
+        run: tree .
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Docker Compose
+        uses: ndeloof/install-compose-action@v1
+
+      - name: Run tests with Docker Compose
+        run: docker-compose up --build --abort-on-container-exit --exit-code-from test
+
+      - name: Generate Allure Report
+        run: |
+          pip install allure-commandline
+          allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report

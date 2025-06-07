@@ -2,6 +2,9 @@ import pytest
 import allure
 from selenium import webdriver
 
+from selenium.webdriver.chrome.options import Options
+import os
+
 from pages.signup_page import SignUpPage
 from urls import Urls
 from helper import Helper
@@ -14,9 +17,23 @@ from api.user_api import RegisterUserAPI
 @pytest.fixture(scope='function')
 def driver():
     with allure.step('Open browser.'):
-        driver = webdriver.Chrome()
-    driver.get(Urls.MAIN_PAGE)
+        selenoid_url = os.getenv('SELENOID_URL', 'http://selenoid:4444/wd/hub')
+
+        options = Options()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--disable-software-rasterizer')
+        options.add_argument('--headless=new')
+
+        driver = webdriver.Remote(
+            command_executor=selenoid_url,
+            options=options
+        )
+        driver.get(Urls.MAIN_PAGE)
+
     yield driver
+
     with allure.step('Close browser.'):
         driver.quit()
 
