@@ -31,9 +31,15 @@ jobs:
       - name: Run tests with Docker Compose
         run: docker-compose up --build --abort-on-container-exit --exit-code-from test
 
+      - name: Install Allure CLI
+        run: |
+          curl -o allure.zip -L https://github.com/allure-framework/allure2/releases/latest/download/allure-2.27.0.zip
+          unzip allure.zip -d allure-cli
+          sudo mv allure-cli/allure-2.27.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
       - name: Generate Allure Report
         run: |
-          pip install allure-commandline
           allure generate allure-results -o allure-report --clean
 
       - name: Upload Allure Report
